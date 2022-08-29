@@ -37,8 +37,8 @@ WSADATA wsaData;
 #include <unistd.h>
 #endif
 
-#define SERVER "10.1.1.27"
-#define EXPORT "/VIRTUAL"
+#define SERVER "172.31.46.194"
+#define EXPORT "/home/ubuntu/nfs_export"
 #define NFSFILE "/BOOKS/Classics/Dracula.djvu"
 #define NFSDIR "/BOOKS/Classics/"
 
