@@ -83,6 +83,8 @@
 #include <errno.h>
 #include <time.h>
 #include <sys/types.h>
+
+#include "network-api.h"
 #include "libnfs-zdr.h"
 #include "libnfs.h"
 #include "libnfs-raw.h"
@@ -100,6 +102,7 @@
 #endif
 #endif
 
+
 static int
 rpc_reconnect_requeue(struct rpc_context *rpc);
 
@@ -111,13 +114,13 @@ create_socket(int domain, int type, int protocol)
     /* Linux-specific extension (since 2.6.27): set the
 	   close-on-exec flag on all sockets to avoid leaking file
 	   descriptors to child processes */
-	int fd = socket(domain, type|SOCK_CLOEXEC, protocol);
+	int fd = Socket(domain, type|SOCK_CLOEXEC, protocol);
 	if (fd >= 0 || errno != EINVAL)
 		return fd;
 #endif
 #endif
 
-	return socket(domain, type, protocol);
+	return Socket(domain, type, protocol);
 }
 
 static int
@@ -126,10 +129,10 @@ set_nonblocking(int fd)
 	int v = 0;
 #if defined(WIN32)
 	u_long nonblocking=1;
-	v = ioctl(fd, FIONBIO, &nonblocking);
+	v = Ioctl(fd, FIONBIO, &nonblocking);
 #else
-	v = fcntl(fd, F_GETFL, 0);
-	v = fcntl(fd, F_SETFL, v | O_NONBLOCK);
+	v = Fcntl(fd, F_GETFL, 0);
+	v = Fcntl(fd, F_SETFL, v | O_NONBLOCK);
 #endif
 	return v;
 }
@@ -141,7 +144,7 @@ set_nolinger(int fd)
 	struct linger lng;
 	lng.l_onoff = 1;
 	lng.l_linger = 0;
-	setsockopt(fd, SOL_SOCKET, SO_LINGER, (char *)&lng, sizeof(lng));
+	Setsockopt(fd, SOL_SOCKET, SO_LINGER, (char *)&lng, sizeof(lng));
 #endif
 }
 
@@ -152,7 +155,7 @@ set_bind_device(int fd, char *ifname)
 
 #ifdef HAVE_SO_BINDTODEVICE
 	if (*ifname) {
-		rc = setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, ifname,
+		rc = Setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, ifname,
                                 strlen(ifname));
 	}
 
@@ -177,7 +180,7 @@ set_tcp_sockopt(int sockfd, int optname, int value)
 		level = SOL_TCP;
 	#endif
 
-	return setsockopt(sockfd, level, optname, (char *)&value,
+	return Setsockopt(sockfd, level, optname, (char *)&value,
                           sizeof(value));
 }
 #endif
@@ -254,7 +257,7 @@ rpc_write_to_socket(struct rpc_context *rpc)
 
 		total = pdu->outdata.size;
 
-		count = send(rpc->fd, pdu->outdata.data + pdu->written,
+		count = Send(rpc->fd, pdu->outdata.data + pdu->written,
                              (int)(total - pdu->written), MSG_NOSIGNAL);
 		if (count == -1) {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -315,7 +318,7 @@ rpc_read_from_socket(struct rpc_context *rpc)
                                       "recvfrom");
 			return -1;
 		}
-		count = recvfrom(rpc->fd, buf, MAX_UDP_SIZE, MSG_DONTWAIT,
+		count = Recvfrom(rpc->fd, buf, MAX_UDP_SIZE, MSG_DONTWAIT,
                                  (struct sockaddr *)&rpc->udp_src, &socklen);
 		if (count == -1) {
 			free(buf);
@@ -367,7 +370,7 @@ rpc_read_from_socket(struct rpc_context *rpc)
 			buf = rpc->inbuf;
 		}
 
-		count = recv(rpc->fd, buf + rpc->inpos, pdu_size - rpc->inpos,
+		count = Recv(rpc->fd, buf + rpc->inpos, pdu_size - rpc->inpos,
                              MSG_DONTWAIT);
 		if (count < 0) {
 			if (errno == EINTR || errno == EAGAIN) {
@@ -504,7 +507,7 @@ rpc_service(struct rpc_context *rpc, int revents)
 #endif
 			socklen_t err_size = sizeof(err);
 
-			if (getsockopt(rpc->fd, SOL_SOCKET, SO_ERROR,
+			if (Getsockopt(rpc->fd, SOL_SOCKET, SO_ERROR,
 				(char *)&err, &err_size) != 0 || err != 0) {
 				if (err == 0) {
 					err = errno;
@@ -532,7 +535,7 @@ rpc_service(struct rpc_context *rpc, int revents)
 		int err = 0;
 		socklen_t err_size = sizeof(err);
 
-		if (getsockopt(rpc->fd, SOL_SOCKET, SO_ERROR,
+		if (Getsockopt(rpc->fd, SOL_SOCKET, SO_ERROR,
 				(char *)&err, &err_size) != 0 || err != 0) {
 			if (err == 0) {
 				err = errno;
@@ -724,7 +727,7 @@ rpc_connect_sockaddr_async(struct rpc_context *rpc)
 #endif
 				}
 
-				rc = bind(rpc->fd, (struct sockaddr *)&ss,
+				rc = Bind(rpc->fd, (struct sockaddr *)&ss,
                                           socksize);
 #if !defined(WIN32)
 				/* we got EACCES, so don't try again */
@@ -738,7 +741,7 @@ rpc_connect_sockaddr_async(struct rpc_context *rpc)
 	rpc->is_nonblocking = !set_nonblocking(rpc->fd);
 	set_nolinger(rpc->fd);
 
-	if (connect(rpc->fd, (struct sockaddr *)s, socksize) != 0 &&
+	if (Connect(rpc->fd, (struct sockaddr *)s, socksize) != 0 &&
             errno != EINPROGRESS) {
 		rpc_set_error(rpc, "connect() to server failed. %s(%d)",
                               strerror(errno), errno);
@@ -974,7 +977,7 @@ rpc_bind_udp(struct rpc_context *rpc, char *addr, int port)
 			return -1;
 		}
 
-		if (bind(rpc->fd, (struct sockaddr *)ai->ai_addr,
+		if (Bind(rpc->fd, (struct sockaddr *)ai->ai_addr,
                          sizeof(struct sockaddr_in)) != 0) {
 			rpc_set_error(rpc, "Failed to bind to UDP socket: %s",
                                       strerror(errno));
@@ -1020,7 +1023,7 @@ rpc_set_udp_destination(struct rpc_context *rpc, char *addr, int port,
 	freeaddrinfo(ai);
 
 	rpc->is_broadcast = is_broadcast;
-	setsockopt(rpc->fd, SOL_SOCKET, SO_BROADCAST, (char *)&is_broadcast,
+	Setsockopt(rpc->fd, SOL_SOCKET, SO_BROADCAST, (char *)&is_broadcast,
                    sizeof(is_broadcast));
 
 	return 0;
@@ -1079,6 +1082,6 @@ rpc_is_udp_socket(struct rpc_context *rpc)
 #endif
         socklen_t len = sizeof(type);
 
-        getsockopt(rpc->fd, SOL_SOCKET, SO_TYPE, &type, &len);
+        Getsockopt(rpc->fd, SOL_SOCKET, SO_TYPE, &type, &len);
         return type == SOCK_DGRAM;
 }

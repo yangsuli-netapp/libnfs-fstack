@@ -99,6 +99,7 @@
 #include <sys/time.h>
 #endif
 
+#include "network-api.h"
 #include "libnfs-zdr.h"
 #include "libnfs.h"
 #include "libnfs-raw.h"
@@ -2605,7 +2606,7 @@ send_nfsd_probes(struct rpc_context *rpc, struct ifconf *ifc,
 			continue;
 		}
 #ifndef PS3_PPU
-		if (ioctl(rpc_get_fd(rpc), SIOCGIFFLAGS, &ifr) < 0) {
+		if (Ioctl(rpc_get_fd(rpc), SIOCGIFFLAGS, &ifr) < 0) {
 			return -1;
 		}
 #endif
@@ -2619,7 +2620,7 @@ send_nfsd_probes(struct rpc_context *rpc, struct ifconf *ifc,
 			continue;
 		}
 #ifndef PS3_PPU
-		if (ioctl(rpc_get_fd(rpc), SIOCGIFBRDADDR, &ifr) < 0) {
+		if (Ioctl(rpc_get_fd(rpc), SIOCGIFBRDADDR, &ifr) < 0) {
 			continue;
 		}
 #endif
@@ -2675,7 +2676,7 @@ nfs_find_local_servers(void)
 		ifc.ifc_buf = malloc(size);
 		memset(ifc.ifc_buf, 0, size);
 #ifndef PS3_PPU
-		if (ioctl(rpc_get_fd(rpc), SIOCGIFCONF, (caddr_t)&ifc) < 0) {
+		if (Ioctl(rpc_get_fd(rpc), SIOCGIFCONF, (caddr_t)&ifc) < 0) {
 			rpc_destroy_context(rpc);
 			free(ifc.ifc_buf);
 			return NULL;
