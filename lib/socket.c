@@ -319,7 +319,7 @@ rpc_read_from_socket(struct rpc_context *rpc)
 			return -1;
 		}
 		count = Recvfrom(rpc->fd, buf, MAX_UDP_SIZE, MSG_DONTWAIT,
-                                 (struct sockaddr *)&rpc->udp_src, &socklen);
+                                 (struct Sockaddr *)&rpc->udp_src, &socklen);
 		if (count == -1) {
 			free(buf);
 			if (errno == EINTR || errno == EAGAIN) {
@@ -727,7 +727,7 @@ rpc_connect_sockaddr_async(struct rpc_context *rpc)
 #endif
 				}
 
-				rc = Bind(rpc->fd, (struct sockaddr *)&ss,
+				rc = Bind(rpc->fd, (struct Sockaddr *)&ss,
                                           socksize);
 #if !defined(WIN32)
 				/* we got EACCES, so don't try again */
@@ -741,7 +741,7 @@ rpc_connect_sockaddr_async(struct rpc_context *rpc)
 	rpc->is_nonblocking = !set_nonblocking(rpc->fd);
 	set_nolinger(rpc->fd);
 
-	if (Connect(rpc->fd, (struct sockaddr *)s, socksize) != 0 &&
+	if (Connect(rpc->fd, (struct Sockaddr *)s, socksize) != 0 &&
             errno != EINPROGRESS) {
 		rpc_set_error(rpc, "connect() to server failed. %s(%d)",
                               strerror(errno), errno);
@@ -977,7 +977,7 @@ rpc_bind_udp(struct rpc_context *rpc, char *addr, int port)
 			return -1;
 		}
 
-		if (Bind(rpc->fd, (struct sockaddr *)ai->ai_addr,
+		if (Bind(rpc->fd, (struct Sockaddr *)ai->ai_addr,
                          sizeof(struct sockaddr_in)) != 0) {
 			rpc_set_error(rpc, "Failed to bind to UDP socket: %s",
                                       strerror(errno));
