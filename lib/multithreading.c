@@ -47,6 +47,7 @@
 #include <sys/time.h>
 #endif
 
+#include "network-api.h"
 #include "libnfs.h"
 #include "libnfs-raw.h"
 #include "libnfs-private.h"
@@ -81,7 +82,7 @@ static void *nfs_mt_service_thread(void *arg)
 		pfd.events = nfs_which_events(nfs);
 		pfd.revents = 0;
 
-		ret = poll(&pfd, 1, 0);
+		ret = Poll(&pfd, 1, 0);
 		if (ret < 0) {
 			nfs_set_error(nfs, "Poll failed");
 			revents = -1;
@@ -177,7 +178,7 @@ static void* nfs_mt_service_thread(void* arg)
         pfd.events = nfs_which_events(nfs);
         pfd.revents = 0;
 
-        ret = poll(&pfd, 1, 0);
+        ret = Poll(&pfd, 1, 0);
         if (ret < 0) {
             nfs_set_error(nfs, "Poll failed");
             revents = -1;

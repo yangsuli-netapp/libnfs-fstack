@@ -226,7 +226,7 @@ wait_for_reply(struct rpc_context *rpc, struct sync_cb_data *cb_data)
 		pfd.events  = rpc_which_events(rpc);
 		pfd.revents = 0;
 
-		ret = poll(&pfd, 1, 100);
+		ret = Poll(&pfd, 1, 100);
 		if (ret < 0) {
 			rpc_set_error(rpc, "Poll failed");
 			revents = -1;
@@ -272,7 +272,7 @@ wait_for_nfs_reply(struct nfs_context *nfs, struct sync_cb_data *cb_data)
 		pfd.events = nfs_which_events(nfs);
 		pfd.revents = 0;
 
-		ret = poll(&pfd, 1, 100);
+		ret = Poll(&pfd, 1, 100);
 		if (ret < 0) {
 			nfs_set_error(nfs, "Poll failed");
 			revents = -1;
@@ -2548,7 +2548,7 @@ nfs_find_local_servers(void)
       -    (tv_current.tv_sec *1000 + tv_current.tv_usec / 1000)
       +    (tv_start.tv_sec *1000 + tv_start.tv_usec / 1000);
 
-      if (poll(&pfd, 1, mpt) < 0)
+      if (Poll(&pfd, 1, mpt) < 0)
       {
         free_nfs_srvr_list(data.srvrs);
         rpc_destroy_context(rpc);
@@ -2703,7 +2703,7 @@ nfs_find_local_servers(void)
 			-    (tv_current.tv_sec *1000 + tv_current.tv_usec / 1000)
 			+    (tv_start.tv_sec *1000 + tv_start.tv_usec / 1000);
 
-			if (poll(&pfd, 1, mpt) < 0) {
+			if (Poll(&pfd, 1, mpt) < 0) {
 				free_nfs_srvr_list(data.srvrs);
 				rpc_destroy_context(rpc);
 				return NULL;

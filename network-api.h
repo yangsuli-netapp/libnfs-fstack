@@ -3,6 +3,9 @@
 
 #ifdef USE_FSTACK
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include <ff_config.h>
 #include <ff_api.h>
 
@@ -16,6 +19,7 @@
 #define Recvfrom ff_recvfrom
 #define Bind ff_bind
 #define Connect ff_connect
+#define Poll ff_poll
 
 #define Sockaddr linux_sockaddr
 
@@ -31,6 +35,7 @@
 #define Recvfrom recvfrom
 #define Bind bind
 #define Connect connect
+#define Poll poll
 
 #define Sockaddr sockaddr
 
