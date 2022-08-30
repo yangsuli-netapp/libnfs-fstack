@@ -46,6 +46,8 @@ WSADATA wsaData;
 #include <stdlib.h>
 #include <stdint.h>
 #include <sys/types.h>
+#include <assert.h>
+
 #include <fcntl.h>
 #include "libnfs.h"
 #include "libnfs-raw.h"
@@ -232,12 +234,14 @@ void nfs_mount_cb(int status, struct nfs_context *nfs, void *data, void *private
 
 
 
-int main(int argc _U_, char *argv[] _U_)
+int main(int argc, char *argv[])
 {
 	struct nfs_context *nfs;
 	int ret;
 	struct client client;
 	struct pollfd pfds[2]; /* nfs:0  mount:1 */
+
+	assert(ff_init(argc, argv)==0);
 
 #ifdef WIN32
 	if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
