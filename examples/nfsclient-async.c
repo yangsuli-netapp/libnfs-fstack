@@ -234,11 +234,55 @@ void nfs_mount_cb(int status, struct nfs_context *nfs, void *data, void *private
 	}
 }
 
+struct nfs_context *nfs;
+
+int loop(void *arg) {
+	struct client* client = (struct client*)arg;
+	struct pollfd pfds[2]; /* nfs:0 mount:1 */
+	int num_fds;
+
+	pfds[0].fd = nfs_get_fd(nfs);
+	pfds[0].events = nfs_which_events(nfs);
+	num_fds = 1;
+
+	if(mount_context != 0 && rpc_get_fd(mount_context) != -1) {
+		pfds[1].fd = rpc_get_fd(mount_context);
+		pfds[1].events = rpc_which_events(mount_context);
+		num_fds = 2;
+	}
+
+	if (Poll(&pfds[0], 2, -1) < 0) {
+		printf("Poll failed\n");
+		exit(10);
+		return -1;
+	}
+
+	if (mount_context != NULL) {
+		if (rpc_service(mount_context, pfds[1].revents) < 0) {
+			printf("rpc_service failed\n");
+                	exit(9);
+			return -1;
+		}
+	}
+
+	if (nfs_service(nfs, pfds[0].revents) < 0) {
+		printf("nfs_service failed\n");
+                exit(9);
+		return -1;
+	}
+
+	if (client->is_finished) {
+		printf("client is_finished. Should terminate now\n");
+		exit(0);
+		return 0;
+	}
+
+	return 0;
+}
 
 
 int main(int argc, char *argv[])
 {
-	struct nfs_context *nfs;
 	int ret;
 	struct client client;
 	struct pollfd pfds[2]; /* nfs:0  mount:1 */
@@ -270,6 +314,9 @@ int main(int argc, char *argv[])
 		exit(10);
 	}
 
+	ff_run(loop, &client);
+
+	/*
 	for (;;) {
 		int num_fds;
 
@@ -300,6 +347,7 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+	*/
 	
 	nfs_destroy_context(nfs);
 	if (mount_context != NULL) {
@@ -312,3 +360,4 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
