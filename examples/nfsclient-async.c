@@ -48,7 +48,9 @@ WSADATA wsaData;
 #include <sys/types.h>
 #include <assert.h>
 
-#include <fcntl.h>
+//#include <fcntl.h>
+#include <sys/fcntl.h>
+#include "network-api.h"
 #include "libnfs.h"
 #include "libnfs-raw.h"
 #include "libnfs-raw-mount.h"
@@ -241,7 +243,9 @@ int main(int argc, char *argv[])
 	struct client client;
 	struct pollfd pfds[2]; /* nfs:0  mount:1 */
 
-	assert(ff_init(argc, argv)==0);
+	//assert(ff_init(argc, argv)==0);
+	ret = ff_init(argc, argv);
+	printf("yangsuli ff_init returned %d\n", ret);
 
 #ifdef WIN32
 	if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
@@ -249,7 +253,7 @@ int main(int argc, char *argv[])
 		exit(10);
 	}
 #endif
-
+	
 	client.server = SERVER;
 	client.export = EXPORT;
 	client.is_finished = 0;
@@ -278,7 +282,7 @@ int main(int argc, char *argv[])
 			pfds[1].events = rpc_which_events(mount_context);
 			num_fds = 2;
 		}
-		if (poll(&pfds[0], 2, -1) < 0) {
+		if (Poll(&pfds[0], 2, -1) < 0) {
 			printf("Poll failed");
 			exit(10);
 		}
@@ -303,5 +307,8 @@ int main(int argc, char *argv[])
 		mount_context = NULL;
 	}
 	printf("nfsclient finished\n");
+
+	
+
 	return 0;
 }
