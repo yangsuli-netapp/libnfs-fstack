@@ -1,6 +1,10 @@
 #ifndef _NETWORK_API_H_
 #define _NETWORK_API_H_
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
+
 #ifdef USE_FSTACK
 
 #include <stddef.h>
