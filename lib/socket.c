@@ -52,11 +52,11 @@
 #endif
 
 #ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
+//#include <sys/socket.h>
 #endif
 
 #ifdef HAVE_NETINET_IN_H
-#include <netinet/in.h>
+//#include <netinet/in.h>
 #endif
 
 #ifdef HAVE_NETINET_TCP_H
@@ -78,7 +78,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <fcntl.h>
+//#include <fcntl.h>
+#include <sys/fcntl.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
@@ -114,7 +115,9 @@ create_socket(int domain, int type, int protocol)
     /* Linux-specific extension (since 2.6.27): set the
 	   close-on-exec flag on all sockets to avoid leaking file
 	   descriptors to child processes */
-	int fd = Socket(domain, type|SOCK_CLOEXEC, protocol);
+	//int fd = Socket(domain, type|SOCK_CLOEXEC, protocol);
+	//FIXME-yangsuli: tmp fix to resolve SOCK_CLOEXEC value incompatible problem
+	int fd = Socket(domain, type, protocol);
 	if (fd >= 0 || errno != EINVAL)
 		return fd;
 #endif
@@ -123,6 +126,7 @@ create_socket(int domain, int type, int protocol)
 	return Socket(domain, type, protocol);
 }
 
+#define YANGSULI_NONBLOCK 	0x0004
 static int
 set_nonblocking(int fd)
 {
@@ -132,7 +136,8 @@ set_nonblocking(int fd)
 	v = Ioctl(fd, FIONBIO, &nonblocking);
 #else
 	v = Fcntl(fd, F_GETFL, 0);
-	v = Fcntl(fd, F_SETFL, v | O_NONBLOCK);
+	printf("Fcntl retuned: %d, O_NONBLOCK: %d\n", v, O_NONBLOCK);
+	v = Fcntl(fd, F_SETFL, v | YANGSULI_NONBLOCK);
 #endif
 	return v;
 }
