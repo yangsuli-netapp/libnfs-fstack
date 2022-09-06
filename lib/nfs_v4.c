@@ -98,7 +98,9 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+//#include <fcntl.h>
+#include <sys/fcntl.h>
+//#include "network-api.h"
 #include "libnfs-zdr.h"
 #include "slist.h"
 #include "libnfs.h"
