@@ -54,6 +54,7 @@ WSADATA wsaData;
 #include "libnfs.h"
 #include "libnfs-raw.h"
 #include "libnfs-raw-mount.h"
+#include "nfs4/libnfs-raw-nfs4.h"
 
 struct rpc_context *mount_context;
 
@@ -307,6 +308,8 @@ int main(int argc, char *argv[])
 		printf("failed to init context\n");
 		exit(10);
 	}
+
+	assert(nfs_set_version(nfs, NFS_V4) == 0);
 
 	ret = nfs_mount_async(nfs, client.server, client.export, nfs_mount_cb, &client);
 	if (ret != 0) {
