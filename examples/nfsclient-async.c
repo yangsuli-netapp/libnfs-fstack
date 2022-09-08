@@ -48,13 +48,13 @@ WSADATA wsaData;
 #include <sys/types.h>
 #include <assert.h>
 
-//#include <fcntl.h>
-#include <sys/fcntl.h>
-#include "network-api.h"
+#include <fcntl.h>
 #include "libnfs.h"
 #include "libnfs-raw.h"
 #include "libnfs-raw-mount.h"
 #include "nfs4/libnfs-raw-nfs4.h"
+
+#include "network-api.h"
 
 struct rpc_context *mount_context;
 

@@ -93,16 +93,16 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-//#include <fcntl.h>
-#include <sys/fcntl.h>
-//#include "/home/ubuntu/f-stack/freebsd/sys/fcntl.h"
-#include "network-api.h"
+#include <fcntl.h>
 #include "libnfs-zdr.h"
 #include "slist.h"
 #include "libnfs.h"
 #include "libnfs-raw.h"
 #include "libnfs-raw-mount.h"
 #include "libnfs-private.h"
+
+#include "network-api.h"
+
 
 static dev_t
 specdata3_to_rdev(struct specdata3 *rdev)

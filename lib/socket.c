@@ -78,14 +78,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-//#include <fcntl.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
 #include <sys/types.h>
 
-#include "network-api.h"
 #include "libnfs-zdr.h"
 #include "libnfs.h"
 #include "libnfs-raw.h"
@@ -96,6 +94,8 @@
 //has to be included after stdlib!!
 #include "win32_errnowrapper.h"
 #endif
+
+#include "network-api.h"
 
 #ifndef MSG_NOSIGNAL
 #if (defined(__APPLE__) && defined(__MACH__)) || defined(PS2_EE)
@@ -115,9 +115,7 @@ create_socket(int domain, int type, int protocol)
     /* Linux-specific extension (since 2.6.27): set the
 	   close-on-exec flag on all sockets to avoid leaking file
 	   descriptors to child processes */
-	//int fd = Socket(domain, type|SOCK_CLOEXEC, protocol);
-	//FIXME-yangsuli: tmp fix to resolve SOCK_CLOEXEC value incompatible problem
-	int fd = Socket(domain, type, protocol);
+	int fd = Socket(domain, type|SOCK_CLOEXEC, protocol);
 	if (fd >= 0 || errno != EINVAL)
 		return fd;
 #endif
@@ -126,7 +124,6 @@ create_socket(int domain, int type, int protocol)
 	return Socket(domain, type, protocol);
 }
 
-#define YANGSULI_NONBLOCK 	0x0004
 static int
 set_nonblocking(int fd)
 {
@@ -137,7 +134,7 @@ set_nonblocking(int fd)
 #else
 	v = Fcntl(fd, F_GETFL, 0);
 	printf("Fcntl retuned: %d, O_NONBLOCK: %d\n", v, O_NONBLOCK);
-	v = Fcntl(fd, F_SETFL, v | YANGSULI_NONBLOCK);
+	v = Fcntl(fd, F_SETFL, v | O_NONBLOCK);
 #endif
 	return v;
 }

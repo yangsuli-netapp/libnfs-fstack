@@ -39,11 +39,11 @@
 #endif
 
 #ifdef HAVE_SYS_SOCKET_H
-//#include <sys/socket.h>
+#include <sys/socket.h>
 #endif
 
 #ifdef HAVE_NET_IF_H
-//#include <net/if.h>
+#include <net/if.h>
 #endif
 
 #ifdef HAVE_SYS_VFS_H
@@ -63,7 +63,7 @@
 #endif
 
 #ifdef HAVE_POLL_H
-//#include <poll.h>
+#include <poll.h>
 #endif
 
 #ifdef HAVE_NETDB_H
@@ -88,18 +88,17 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-//#include <fcntl.h>
+#include <fcntl.h>
 #include <errno.h>
 
 #ifdef HAVE_SYS_SOCKIO_H
-//#include <sys/sockio.h>
+#include <sys/sockio.h>
 #endif
 
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 
-#include "network-api.h"
 #include "libnfs-zdr.h"
 #include "libnfs.h"
 #include "libnfs-raw.h"
@@ -107,6 +106,8 @@
 #include "libnfs-raw-nfs.h"
 #include "libnfs-raw-nfs4.h"
 #include "libnfs-private.h"
+
+#include "network-api.h"
 
 struct sync_cb_data {
 	int is_finished;

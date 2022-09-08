@@ -40,14 +40,13 @@
 #endif
 
 #ifdef HAVE_POLL_H
-//#include <poll.h>
+#include <poll.h>
 #endif
 
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 
-#include "network-api.h"
 #include "libnfs.h"
 #include "libnfs-raw.h"
 #include "libnfs-private.h"
@@ -57,6 +56,8 @@
 #ifdef HAVE_PTHREAD
 #include <unistd.h>
 #include <sys/syscall.h>
+
+#include "network-api.h"
 
 nfs_tid_t nfs_mt_get_tid(void)
 {

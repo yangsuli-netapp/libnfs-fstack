@@ -37,7 +37,7 @@ WSADATA wsaData;
 #endif
  
 #ifdef HAVE_POLL_H
-//#include <poll.h>
+#include <poll.h>
 #endif
 
 #ifdef HAVE_UNISTD_H
@@ -48,7 +48,7 @@ WSADATA wsaData;
 #include <stdlib.h>
 #include <stdint.h>
 #include <sys/types.h>
-//#include <fcntl.h>
+#include <fcntl.h>
 #include <sys/fcntl.h>
 #include "libnfs.h"
 #include "libnfs-raw.h"
