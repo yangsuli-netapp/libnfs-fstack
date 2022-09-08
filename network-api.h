@@ -37,16 +37,30 @@
 // re-define macro values that are inconsistent in Linux and FreeBSD, 
 // as f-stack uses FreeBSD values
 
+// Note: re-define a macro is actually very bad programing practice, 
+// so it's just a temp solution.
+// Eventually we need to modify f-stack to resolve the incompatibility
+// (by define LINUX_xxx, and have f-stack convert the values when appropriate).
+
+#undef  O_NONBLOCK
 #define	O_NONBLOCK		0x0004		
 
+#undef SOCK_CLOEXEC
 #define	SOCK_CLOEXEC	0x10000000
+
+#undef SOCK_NONBLOCK
 #define	SOCK_NONBLOCK	0x20000000
 
+#undef SO_TYPE
 #define	SO_TYPE		0x1008
 
+#undef MSG_DONTWAIT
 #define	MSG_DONTWAIT	0x00000080
 
+#undef EAGAIN
 #define EAGAIN 			35
+
+#undef EINPROGRESS
 #define EINPROGRESS		36
 
 // below is defined in Linux but not in f-stack (no need to deal with them?)
