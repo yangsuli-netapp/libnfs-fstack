@@ -57,12 +57,6 @@
 #undef MSG_DONTWAIT
 #define	MSG_DONTWAIT	0x00000080
 
-#undef EAGAIN
-#define EAGAIN 			35
-
-#undef EINPROGRESS
-#define EINPROGRESS		36
-
 // below is defined in Linux but not in f-stack (no need to deal with them?)
 /*
 #define SO_BINDTODEVICE	 25
