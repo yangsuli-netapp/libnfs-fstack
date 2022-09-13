@@ -4,6 +4,8 @@ ACLOCAL_AMFLAGS = -I m4
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libnfs.pc
 
+AM_LDFLAGS = $(EXTRA_LDFLAGS)
+
 EXTRA_DIST = \
 	README \
 	COPYING \
