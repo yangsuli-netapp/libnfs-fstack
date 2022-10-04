@@ -286,7 +286,7 @@ rpc_write_to_socket(struct rpc_context *rpc)
                                 goto finished;
                         }
 
-			hash = rpc_hash_xid(pdu->xid);
+			hash = rpc_hash_xid(rpc, pdu->xid);
 			rpc_enqueue(&rpc->waitpdu[hash], pdu);
 			rpc->waitpdu_len++;
 		}
@@ -433,6 +433,14 @@ rpc_timeout_scan(struct rpc_context *rpc)
 	uint64_t t = rpc_current_time();
 	unsigned int i;
 
+        /*
+         * Only scan once per second.
+         */
+        if (t <= rpc->last_timeout_scan + 1000) {
+                return;
+        }
+        rpc->last_timeout_scan = t;
+
 #ifdef HAVE_MULTITHREADING
         if (rpc->multithreading_enabled) {
                 nfs_mt_mutex_lock(&rpc->rpc_mutex);
@@ -458,7 +466,7 @@ rpc_timeout_scan(struct rpc_context *rpc)
 			NULL, pdu->private_data);
 		rpc_free_pdu(rpc, pdu);
 	}
-	for (i = 0; i < HASHES; i++) {
+	for (i = 0; i < rpc->num_hashes; i++) {
 		struct rpc_queue *q;
 
                 q = &rpc->waitpdu[i];
@@ -914,7 +922,7 @@ rpc_reconnect_requeue(struct rpc_context *rpc)
                 nfs_mt_mutex_lock(&rpc->rpc_mutex);
         }
 #endif /* HAVE_MULTITHREADING */
-	for (i = 0; i < HASHES; i++) {
+	for (i = 0; i < rpc->num_hashes; i++) {
 		struct rpc_queue *q = &rpc->waitpdu[i];
 		for (pdu = q->head; pdu; pdu = next) {
 			next = pdu->next;
